@@ -2771,6 +2771,8 @@ var exports$1 = {
 	},
 
 	drawPoint: function(ctx, style, radius, x, y, rotation) {
+		//test
+		console.log('test');
 		var type, xOffset, yOffset, size, cornerRadius;
 		var rad = (rotation || 0) * RAD_PER_DEG;
 
