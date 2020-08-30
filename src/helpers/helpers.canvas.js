@@ -63,7 +63,7 @@ var exports = {
 		}
 	},
 
-	drawPoint: function(ctx, style, radius, x, y, rotation) {
+	drawPoint: function(ctx, style, radius, x, y, rotation,extraBorder) {
 		var type, xOffset, yOffset, size, cornerRadius;
 		var rad = (rotation || 0) * RAD_PER_DEG;
 
@@ -81,6 +81,22 @@ var exports = {
 
 		if (isNaN(radius) || radius <= 0) {
 			return;
+		}
+
+		//Drawing extra border
+		if(extraBorder){
+			switch (style) {
+				// Default includes circle
+				default:
+						ctx.save();
+						ctx.beginPath();
+						ctx.arc(x, y, radius+ctx.lineWidth, 0, DOUBLE_PI);
+						ctx.closePath();
+						ctx.fillStyle = extraBorder;
+						ctx.fill();
+						ctx.restore();
+					break;
+				}
 		}
 
 		ctx.beginPath();

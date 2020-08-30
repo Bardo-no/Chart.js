@@ -1208,7 +1208,10 @@ var Scale = Element.extend({
 				label: label,
 				font: font,
 				textOffset: textOffset,
-				textAlign: textAlign
+				textAlign: textAlign,
+				//adding some important info to draw tick hover style on _drawLabel
+				isHorizontal: isHorizontal,
+				position: position
 			});
 		}
 
@@ -1296,18 +1299,36 @@ var Scale = Element.extend({
 	_drawLabels: function() {
 		var me = this;
 		var optionTicks = me.options.ticks;
-
+		
 		if (!optionTicks.display) {
 			return;
+		}
+		//declare some vars to use when drawing ticks color
+		var onhover = false;
+		var aux_x = 0;
+		var aux_y = [];
+		var chart = me.chart;
+
+		//checking if there are hovered elements
+		if(chart.active && chart.active.length)
+		for(let a of me.chart.active){ // when there are hovered elements get the position info
+			onhover = true;
+			aux_x = a._model.x;
+			aux_y.push(a._model.y);
 		}
 
 		var ctx = me.ctx;
 		var items = me._labelItems || (me._labelItems = me._computeLabelItems());
-		var i, j, ilen, jlen, item, tickFont, label, y;
+		var i, j, ilen, jlen, item, tickFont, label, y, next_y;
 
 		for (i = 0, ilen = items.length; i < ilen; ++i) {
 			item = items[i];
 			tickFont = item.font;
+			
+			next_y = null;
+			if(items[i-1]){
+				next_y = items[i-1].y;
+			}
 
 			// Make sure we draw text in the correct color and font
 			ctx.save();
@@ -1317,6 +1338,20 @@ var Scale = Element.extend({
 			ctx.fillStyle = tickFont.color;
 			ctx.textBaseline = 'middle';
 			ctx.textAlign = item.textAlign;
+
+			//set on hover style to tick fill that are on the x or y range depending on orientation
+			if(optionTicks.hoverColor && onhover){
+				if(item.isHorizontal){
+					if( item.x === aux_x ){  ctx.fillStyle=optionTicks.hoverColor; }
+				}else{
+					for( let actual_y of aux_y){
+						if(
+							(actual_y<=item.y)
+							&& (next_y? !(actual_y <= next_y) : true)
+						){ ctx.fillStyle=optionTicks.hoverColor;}
+					}
+				}
+			}
 
 			label = item.label;
 			y = item.textOffset;

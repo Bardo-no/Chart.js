@@ -403,7 +403,7 @@ var Legend = Element.extend({
 				var centerY = y + fontSize / 2;
 
 				// Draw pointStyle as legend symbol
-				helpers.canvas.drawPoint(ctx, legendItem.pointStyle, radius, centerX, centerY, legendItem.rotation);
+				helpers.canvas.drawPoint(ctx, legendItem.pointStyle, radius, centerX, centerY, legendItem.rotation,null);
 			} else {
 				// Draw box as legend symbol
 				ctx.fillRect(rtlHelper.leftForLtr(x, boxWidth), y, boxWidth, fontSize);

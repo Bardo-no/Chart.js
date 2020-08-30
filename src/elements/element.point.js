@@ -87,7 +87,8 @@ module.exports = Element.extend({
 			ctx.strokeStyle = vm.borderColor || defaultColor;
 			ctx.lineWidth = valueOrDefault(vm.borderWidth, globalDefaults.elements.point.borderWidth);
 			ctx.fillStyle = vm.backgroundColor || defaultColor;
-			helpers.canvas.drawPoint(ctx, pointStyle, radius, x, y, rotation);
+			//added new argument, extraBorder
+			helpers.canvas.drawPoint(ctx, pointStyle, radius, x, y, rotation,vm.extraBorder);
 		}
 	}
 });

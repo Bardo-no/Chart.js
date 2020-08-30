@@ -104,6 +104,8 @@ module.exports = DatasetController.extend({
 		borderWidth: 'pointBorderWidth',
 		hitRadius: 'pointHitRadius',
 		hoverBackgroundColor: 'pointHoverBackgroundColor',
+		//add new option to line controller dataset
+		hoverExtraBorderColor: 'pointHoverExtraBorderColor',
 		hoverBorderColor: 'pointHoverBorderColor',
 		hoverBorderWidth: 'pointHoverBorderWidth',
 		hoverRadius: 'pointHoverRadius',
@@ -317,7 +319,6 @@ module.exports = DatasetController.extend({
 	},
 
 	draw: function() {
-		//test
 		var me = this;
 		var chart = me.chart;
 		var meta = me.getMeta();
@@ -361,12 +362,16 @@ module.exports = DatasetController.extend({
 			backgroundColor: model.backgroundColor,
 			borderColor: model.borderColor,
 			borderWidth: model.borderWidth,
-			radius: model.radius
+			radius: model.radius,
+			//sets undefinen extra border when not hovering
+			extraBorder: undefined 
 		};
 
 		model.backgroundColor = valueOrDefault(options.hoverBackgroundColor, getHoverColor(options.backgroundColor));
 		model.borderColor = valueOrDefault(options.hoverBorderColor, getHoverColor(options.borderColor));
 		model.borderWidth = valueOrDefault(options.hoverBorderWidth, options.borderWidth);
+		//sets extra border option for this point to be used on draw method
+		model.extraBorder = valueOrDefault(options.hoverExtraBorderColor,undefined);  
 		model.radius = valueOrDefault(options.hoverRadius, options.radius);
 	},
 });
