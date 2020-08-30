@@ -1,7 +1,7 @@
 /*!
  * Chart.js v2.9.3
  * https://www.chartjs.org
- * (c) 2019 Chart.js Contributors
+ * (c) 2020 Chart.js Contributors
  * Released under the MIT License
  */
 (function (global, factory) {
@@ -2282,7 +2282,7 @@ var helpers = {
 		}
 
 		if (helpers.isObject(source)) {
-			var target = {};
+			var target = Object.create(source);
 			var keys = Object.keys(source);
 			var klen = keys.length;
 			var k = 0;
@@ -2774,7 +2774,7 @@ var exports$1 = {
 		}
 	},
 
-	drawPoint: function(ctx, style, radius, x, y, rotation) {
+	drawPoint: function(ctx, style, radius, x, y, rotation,extraBorder) {
 		var type, xOffset, yOffset, size, cornerRadius;
 		var rad = (rotation || 0) * RAD_PER_DEG;
 
@@ -2792,6 +2792,22 @@ var exports$1 = {
 
 		if (isNaN(radius) || radius <= 0) {
 			return;
+		}
+
+		//Drawing extra border
+		if(extraBorder){
+			switch (style) {
+				// Default includes circle
+				default:
+						ctx.save();
+						ctx.beginPath();
+						ctx.arc(x, y, radius+ctx.lineWidth, 0, DOUBLE_PI);
+						ctx.closePath();
+						ctx.fillStyle = extraBorder;
+						ctx.fill();
+						ctx.restore();
+					break;
+				}
 		}
 
 		ctx.beginPath();
@@ -4507,7 +4523,8 @@ var element_point = core_element.extend({
 			ctx.strokeStyle = vm.borderColor || defaultColor;
 			ctx.lineWidth = valueOrDefault$2(vm.borderWidth, globalDefaults.elements.point.borderWidth);
 			ctx.fillStyle = vm.backgroundColor || defaultColor;
-			helpers$1.canvas.drawPoint(ctx, pointStyle, radius, x, y, rotation);
+			//added new argument, extraBorder
+			helpers$1.canvas.drawPoint(ctx, pointStyle, radius, x, y, rotation,vm.extraBorder);
 		}
 	}
 });
@@ -5863,6 +5880,8 @@ var controller_line = core_datasetController.extend({
 		borderWidth: 'pointBorderWidth',
 		hitRadius: 'pointHitRadius',
 		hoverBackgroundColor: 'pointHoverBackgroundColor',
+		//add new option to line controller dataset
+		hoverExtraBorderColor: 'pointHoverExtraBorderColor',
 		hoverBorderColor: 'pointHoverBorderColor',
 		hoverBorderWidth: 'pointHoverBorderWidth',
 		hoverRadius: 'pointHoverRadius',
@@ -6119,12 +6138,16 @@ var controller_line = core_datasetController.extend({
 			backgroundColor: model.backgroundColor,
 			borderColor: model.borderColor,
 			borderWidth: model.borderWidth,
-			radius: model.radius
+			radius: model.radius,
+			//sets undefinen extra border when not hovering
+			extraBorder: undefined 
 		};
 
 		model.backgroundColor = valueOrDefault$6(options.hoverBackgroundColor, getHoverColor(options.backgroundColor));
 		model.borderColor = valueOrDefault$6(options.hoverBorderColor, getHoverColor(options.borderColor));
 		model.borderWidth = valueOrDefault$6(options.hoverBorderWidth, options.borderWidth);
+		//sets extra border option for this point to be used on draw method
+		model.extraBorder = valueOrDefault$6(options.hoverExtraBorderColor,undefined);  
 		model.radius = valueOrDefault$6(options.hoverRadius, options.radius);
 	},
 });
@@ -7390,7 +7413,7 @@ var platform_basic = {
 	}
 };
 
-var platform_dom = "/*\n * DOM element rendering detection\n * https://davidwalsh.name/detect-node-insertion\n */\n@keyframes chartjs-render-animation {\n\tfrom { opacity: 0.99; }\n\tto { opacity: 1; }\n}\n\n.chartjs-render-monitor {\n\tanimation: chartjs-render-animation 0.001s;\n}\n\n/*\n * DOM element resizing detection\n * https://github.com/marcj/css-element-queries\n */\n.chartjs-size-monitor,\n.chartjs-size-monitor-expand,\n.chartjs-size-monitor-shrink {\n\tposition: absolute;\n\tdirection: ltr;\n\tleft: 0;\n\ttop: 0;\n\tright: 0;\n\tbottom: 0;\n\toverflow: hidden;\n\tpointer-events: none;\n\tvisibility: hidden;\n\tz-index: -1;\n}\n\n.chartjs-size-monitor-expand > div {\n\tposition: absolute;\n\twidth: 1000000px;\n\theight: 1000000px;\n\tleft: 0;\n\ttop: 0;\n}\n\n.chartjs-size-monitor-shrink > div {\n\tposition: absolute;\n\twidth: 200%;\n\theight: 200%;\n\tleft: 0;\n\ttop: 0;\n}\n";
+var platform_dom = "/*\r\n * DOM element rendering detection\r\n * https://davidwalsh.name/detect-node-insertion\r\n */\r\n@keyframes chartjs-render-animation {\r\n\tfrom { opacity: 0.99; }\r\n\tto { opacity: 1; }\r\n}\r\n\r\n.chartjs-render-monitor {\r\n\tanimation: chartjs-render-animation 0.001s;\r\n}\r\n\r\n/*\r\n * DOM element resizing detection\r\n * https://github.com/marcj/css-element-queries\r\n */\r\n.chartjs-size-monitor,\r\n.chartjs-size-monitor-expand,\r\n.chartjs-size-monitor-shrink {\r\n\tposition: absolute;\r\n\tdirection: ltr;\r\n\tleft: 0;\r\n\ttop: 0;\r\n\tright: 0;\r\n\tbottom: 0;\r\n\toverflow: hidden;\r\n\tpointer-events: none;\r\n\tvisibility: hidden;\r\n\tz-index: -1;\r\n}\r\n\r\n.chartjs-size-monitor-expand > div {\r\n\tposition: absolute;\r\n\twidth: 1000000px;\r\n\theight: 1000000px;\r\n\tleft: 0;\r\n\ttop: 0;\r\n}\r\n\r\n.chartjs-size-monitor-shrink > div {\r\n\tposition: absolute;\r\n\twidth: 200%;\r\n\theight: 200%;\r\n\tleft: 0;\r\n\ttop: 0;\r\n}\r\n";
 
 var platform_dom$1 = /*#__PURE__*/Object.freeze({
 __proto__: null,
@@ -12291,7 +12314,10 @@ var Scale = core_element.extend({
 				label: label,
 				font: font,
 				textOffset: textOffset,
-				textAlign: textAlign
+				textAlign: textAlign,
+				//adding some important info to draw tick hover style on _drawLabel
+				isHorizontal: isHorizontal,
+				position: position
 			});
 		}
 
@@ -12379,18 +12405,36 @@ var Scale = core_element.extend({
 	_drawLabels: function() {
 		var me = this;
 		var optionTicks = me.options.ticks;
-
+		
 		if (!optionTicks.display) {
 			return;
+		}
+		//declare some vars to use when drawing ticks color
+		var onhover = false;
+		var aux_x = 0;
+		var aux_y = [];
+		var chart = me.chart;
+
+		//checking if there are hovered elements
+		if(chart.active && chart.active.length)
+		for(let a of me.chart.active){ // when there are hovered elements get the position info
+			onhover = true;
+			aux_x = a._model.x;
+			aux_y.push(a._model.y);
 		}
 
 		var ctx = me.ctx;
 		var items = me._labelItems || (me._labelItems = me._computeLabelItems());
-		var i, j, ilen, jlen, item, tickFont, label, y;
+		var i, j, ilen, jlen, item, tickFont, label, y, next_y;
 
 		for (i = 0, ilen = items.length; i < ilen; ++i) {
 			item = items[i];
 			tickFont = item.font;
+			
+			next_y = null;
+			if(items[i-1]){
+				next_y = items[i-1].y;
+			}
 
 			// Make sure we draw text in the correct color and font
 			ctx.save();
@@ -12400,6 +12444,20 @@ var Scale = core_element.extend({
 			ctx.fillStyle = tickFont.color;
 			ctx.textBaseline = 'middle';
 			ctx.textAlign = item.textAlign;
+
+			//set on hover style to tick fill that are on the x or y range depending on orientation
+			if(optionTicks.hoverColor && onhover){
+				if(item.isHorizontal){
+					if( item.x === aux_x ){  ctx.fillStyle=optionTicks.hoverColor; }
+				}else{
+					for( let actual_y of aux_y){
+						if(
+							(actual_y<=item.y)
+							&& (next_y? !(actual_y <= next_y) : true)
+						){ ctx.fillStyle=optionTicks.hoverColor;}
+					}
+				}
+			}
 
 			label = item.label;
 			y = item.textOffset;
@@ -20123,7 +20181,7 @@ var Legend = core_element.extend({
 				var centerY = y + fontSize / 2;
 
 				// Draw pointStyle as legend symbol
-				helpers$1.canvas.drawPoint(ctx, legendItem.pointStyle, radius, centerX, centerY, legendItem.rotation);
+				helpers$1.canvas.drawPoint(ctx, legendItem.pointStyle, radius, centerX, centerY, legendItem.rotation,null);
 			} else {
 				// Draw box as legend symbol
 				ctx.fillRect(rtlHelper.leftForLtr(x, boxWidth), y, boxWidth, fontSize);
