@@ -1,53 +1,43 @@
-<p>
-	This is a fork of chart.js where i've addesd some functionality to implement on a test project.
-	two options have been added:
-	<b>hoverExtraBorderColor</b>
-		for the line controller dataset the option hoverExtraBorderColor its available for for the default point style, it will add an extra ring below the fill and stroke of the original point using the specified hex color.
-	example: 
+<h1>my Chart.js Fork</h1>
+<p>This is a chart.js fork where i have added some functionality to implement on a test project. Two options have been added and will be described below </p>
+
+<h3>hoverExtraBorderColor</b></h3>
+<p>for the line controller dataset the option hoverExtraBorderColor its available for for the default point style, it will add an extra ring below the fill and stroke of the original point using the specified hex color.
+</p>
+
+
+```javascript
 		const datasets:ChartDataSets[] = [
       {
-        label: 'Fan page',
-        fill: false,
-        data: [292.67, 292.82, 292.54, 292.54, 292.95, 292.41, 292.68, 292.27, 292.41, 292.21, 292.37, 292.50],
+        label: 'test',
+        data: [1,2,3,4],
         backgroundColor: '#4c4cd8a1',
         borderColor: '#4c4cd8a1',
-        borderWidth : 1,
-        yAxisID : 'Fan page',
-        pointHoverRadius : 5,
         pointHoverBackgroundColor : '#4C4CD8',
         pointHoverBorderColor : '#4c4cd8a1',
-        pointHoverBorderWidth : 10,
         //setting color for extra ring when hovering
         hoverExtraBorderColor: '#4c4cd880',
-      },  
-	...
-	
-	<b>hoverColor</b>
-	for the ticks options on the scales there is the hoverColor option wich will replace the color of the ticks for the specified hex color when there is an active hovered element 
-	example:
-		 const options : ChartOptions = {
-		 	 scales : {
+      }
+```
+
+<h3>hoverColor</h3>
+<p>for the ticks options on the scales there is the hoverColor option wich will replace the color of the ticks for the specified hex color when there is an active hovered element</p>
+
+```javascript
+const options : ChartOptions = {
+	scales : {
         xAxes : [
           {
             ticks : {
               fontColor : '#EBEBEBa1',
               //setting color when hovering on a point in range
               hoverColor: '#F8CB1C',
-              callback : (value) => {
-                return value
-              },
-              fontSize : 10,
-              fontFamily : 'Work Sans',
-              padding : 6
-            },
-            gridLines : {
-              display : false,
             },
           },
         ],
-		...
-</p>
-ill leave the original readme below.
+```
+
+<p>original readme below.</p>
 
 
 <p align="center">
